@@ -15,7 +15,12 @@ This docker image supports full TeX Live with following additions:
 ### Using docker
 
 ```terminal
-docker run --rm -it -v $(pwd):/home danteev/texlive latexmk -pdf document.tex
+docker run --rm -it -v $(pwd):/home nicetiger/texlive latexmk -pdf document.tex
+```
+
+When using plantuml, we need to use lualatex and shell-escape. 
+```terminal
+docker run --rm -it -v ${PWD}:/home nicetiger/texlive latexmk -shell-escape -pdflatex=lualatex -pdf document.tex
 ```
 
 ### Usage in [GitHub Workflows](https://help.github.com/en/articles/about-github-actions)
