@@ -19,7 +19,12 @@ It builds on the [full texlive image by "Island of TeX"](https://gitlab.com/isla
 ### Using docker
 
 ```terminal
-docker run --rm -it -v $(pwd):/workdir danteev/texlive latexmk -pdf document.tex
+docker run --rm -it -v $(pwd):/home nicetiger/texlive latexmk -pdf document.tex
+```
+
+When using plantuml, we need to use lualatex and shell-escape. 
+```terminal
+docker run --rm -it -v ${PWD}:/home nicetiger/texlive latexmk -shell-escape -pdflatex=lualatex -pdf document.tex
 ```
 
 ### Usage in [GitHub Workflows](https://help.github.com/en/articles/about-github-actions)
