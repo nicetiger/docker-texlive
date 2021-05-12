@@ -17,8 +17,8 @@ RUN mkdir -p /usr/share/man/man1
 RUN wget https://github.com/jgm/pandoc/releases/download/2.12/pandoc-2.12-1-amd64.deb -q --output-document=/home/pandoc.deb && dpkg -i pandoc.deb && rm pandoc.deb
 
 # get PlantUML in place
-RUN wget https://netcologne.dl.sourceforge.net/project/plantuml/plantuml.jar -q --output-document=/home/plantuml.jar
-ENV PLANTUML_JAR=/home/plantuml.jar
+RUN wget https://netcologne.dl.sourceforge.net/project/plantuml/plantuml.jar -q --output-document=/usr/local/plantuml.jar
+ENV PLANTUML_JAR=/usr/local/plantuml.jar
 
 # install pkgcheck
 RUN wget https://gitlab.com/Lotz/pkgcheck/raw/master/bin/pkgcheck -q --output-document=/usr/local/bin/pkgcheck && chmod a+x /usr/local/bin/pkgcheck
@@ -77,7 +77,10 @@ RUN git config --global advice.detachedHead false && \
     rm -rf /tmp/git-latexdiff
 
 # install luximono
-# RUN cd /tmp && wget https://www.tug.org/fonts/getnonfreefonts/install-getnonfreefonts && texlua install-getnonfreefonts && getnonfreefonts --sys luximono
+RUN cd /tmp && \
+    wget https://www.tug.org/fonts/getnonfreefonts/install-getnonfreefonts -q --output-document=/tmp/install-getnonfreefonts && \
+    texlua /tmp/install-getnonfreefonts && \
+    /usr/local/texlive/2021/texmf-dist/scripts/getnonfreefonts/getnonfreefonts.pl --sys --all
 
 # update font index
 RUN luaotfload-tool --update
