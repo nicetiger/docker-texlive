@@ -19,6 +19,26 @@ WORKDIR /home
 # See https://github.com/debuerreotype/docker-debian-artifacts/issues/24#issuecomment-360870939
 RUN mkdir -p /usr/share/man/man1
 
+# pandoc in the repositories is older - we just overwrite it with a more recent version
+RUN wget https://github.com/jgm/pandoc/releases/download/2.12/pandoc-2.12-1-amd64.deb -q --output-document=/home/pandoc.deb && dpkg -i pandoc.deb && rm pandoc.deb
+
+# get PlantUML in place
+RUN wget https://netcologne.dl.sourceforge.net/project/plantuml/plantuml.jar -q --output-document=/usr/local/plantuml.jar
+ENV PLANTUML_JAR=/usr/local/plantuml.jar
+
+# install pkgcheck
+RUN wget https://gitlab.com/Lotz/pkgcheck/raw/master/bin/pkgcheck -q --output-document=/usr/local/bin/pkgcheck && chmod a+x /usr/local/bin/pkgcheck
+
+# Install IBM Plex fonts
+RUN mkdir -p /tmp/fonts && \
+    cd /tmp/fonts && \
+    wget "https://github.com/IBM/plex/releases/download/v5.1.3/OpenType.zip" -q && \
+    unzip -q OpenType.zip && \
+    cp -r OpenType/* /usr/local/share/fonts && \
+    fc-cache -f -v && \
+    cd .. && \
+    rm -rf fonts
+
 RUN apt-get update -q && \
     # Install git (Required for git-latexdiff)
     apt-get install -qqy -o=Dpkg::Use-Pty=0 --no-install-recommends git wget && \
@@ -85,7 +105,10 @@ RUN mkdir -p /tmp/fonts && \
 #v ENV PATH="/usr/local/texlive/2023/bin/x86_64-linux:${PATH}"
 
 # install luximono
-# RUN cd /tmp && wget https://www.tug.org/fonts/getnonfreefonts/install-getnonfreefonts && texlua install-getnonfreefonts && getnonfreefonts --sys luximono
+RUN cd /tmp && \
+    wget https://www.tug.org/fonts/getnonfreefonts/install-getnonfreefonts -q --output-document=/tmp/install-getnonfreefonts && \
+    texlua /tmp/install-getnonfreefonts && \
+    /usr/local/texlive/2021/texmf-dist/scripts/getnonfreefonts/getnonfreefonts.pl --sys --all
 
 # update font index
 RUN luaotfload-tool --update
