@@ -1,5 +1,11 @@
 FROM registry.gitlab.com/islandoftex/images/texlive:latest
-LABEL maintainer "Oliver Kopp <kopp.dev@gmail.com>"
+
+LABEL \
+  org.opencontainers.image.title="Full TeX Live with additions" \
+  org.opencontainers.image.authors="Oliver Kopp <kopp.dev@gmail.com>" \
+  org.opencontainers.image.source="https://github.com/dante-ev/docker-texlive" \
+  org.opencontainers.image.licenses="MIT"
+
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     TERM=dumb
@@ -12,6 +18,10 @@ WORKDIR /home
 # Fix for update-alternatives: error: error creating symbolic link '/usr/share/man/man1/rmid.1.gz.dpkg-tmp': No such file or directory
 # See https://github.com/debuerreotype/docker-debian-artifacts/issues/24#issuecomment-360870939
 RUN mkdir -p /usr/share/man/man1
+
+RUN apt-get update -q && \
+    # install wget
+    apt-get install -qqy -o=Dpkg::Use-Pty=0 wget
 
 # pandoc in the repositories is older - we just overwrite it with a more recent version
 RUN wget https://github.com/jgm/pandoc/releases/download/2.12/pandoc-2.12-1-amd64.deb -q --output-document=/home/pandoc.deb && dpkg -i pandoc.deb && rm pandoc.deb
@@ -49,6 +59,8 @@ RUN apt-get update -q && \
     apt-get install -qqy -o=Dpkg::Use-Pty=0 curl libgetopt-long-descriptive-perl libdigest-perl-md5-perl fontconfig && \
     # libfile-copy-recursive-perl is required by ctanify
     apt-get install -qqy -o=Dpkg::Use-Pty=0 --no-install-recommends libfile-which-perl libfile-copy-recursive-perl openssh-client && \
+    # latexindent modules
+    apt-get install -qqy -o=Dpkg::Use-Pty=0 libyaml-tiny-perl libfile-homedir-perl libunicode-linebreak-perl liblog-log4perl-perl libtest-log-dispatch-perl && \
     # for plantuml, we need graphviz and inkscape. For inkscape, there is no non-X11 version, so 200 MB more
     apt-get install -qqy -o=Dpkg::Use-Pty=0 --no-install-recommends graphviz inkscape && \
     # some more packages
@@ -61,6 +73,8 @@ RUN apt-get update -q && \
     apt-get install -qqy -o=Dpkg::Use-Pty=0 xzdec && \
     # install bibtool
     apt-get install -qqy -o=Dpkg::Use-Pty=0 bibtool && \
+    # install Python's pip3
+    apt-get install -qqy -o=Dpkg::Use-Pty=0 python3-pip && \
     # install gnuplot
     apt-get install -qqy -o=Dpkg::Use-Pty=0 gnuplot && \
     # Removing documentation packages *after* installing them is kind of hacky,
@@ -76,6 +90,9 @@ RUN git config --global advice.detachedHead false && \
     make -C /tmp/git-latexdiff install-bin && \
     rm -rf /tmp/git-latexdiff
 
+# install-getnonfreefronts uses that directory
+ENV PATH="/usr/local/texlive/2021/bin/x86_64-linux:${PATH}"
+
 # install luximono
 RUN cd /tmp && \
     wget https://www.tug.org/fonts/getnonfreefonts/install-getnonfreefonts -q --output-document=/tmp/install-getnonfreefonts && \
@@ -84,3 +101,5 @@ RUN cd /tmp && \
 
 # update font index
 RUN luaotfload-tool --update
+
+WORKDIR /workdir
