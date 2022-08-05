@@ -1,4 +1,4 @@
-# Docker image for texlive [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![download-size number-of-layers](https://images.microbadger.com/badges/image/danteev/texlive.svg)](https://microbadger.com/images/danteev/texlive)
+# Docker image for texlive [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This docker image supports full TeX Live with following additions:
 
@@ -7,8 +7,13 @@ This docker image supports full TeX Live with following additions:
 - [Inkscape](https://inkscape.org/)
 - [latexmk](https://www.ctan.org/pkg/latexmk/) - an automator for latex building
 - [Pandoc](http://pandoc.org/) - to convert from and to `.tex`
+- Python
+  - [pygments](https://pygments.org/). This enables the usage of the [minted](https://ctan.org/pkg/minted) package for source code highlighting.
+  - [pip](https://pypi.org/project/pip/). This enables manual Python package installation.
 - [git-latexdiff](https://gitlab.com/git-latexdiff/git-latexdiff) - to enable diffs of LaTeX documents
 - Java headless - required for Pandoc
+
+It builds on the [full texlive image by "Island of TeX"](https://gitlab.com/islandoftex/images/texlive) with additions concidered important.
 
 ## Usage
 
@@ -37,10 +42,12 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
       - name: Compile document.tex
-        uses: dante-ev/latex-action@master
+        uses: dante-ev/latex-action@edge
         with:
           root_file: document.tex
 ```
+
+See [dante-ev/latex-action](https://github.com/dante-ev/latex-action#readme) for documentation on the different `with` options available.
 
 You can also use it with multiple files as outlined here:
 
@@ -124,7 +131,7 @@ language: generic
 services: docker
 
 script:
-- docker run --rm -it -v $(pwd):/home danteev/texlive latexmk -pdf document.tex
+- docker run --rm -it -v $(pwd):/workdir danteev/texlive latexmk -pdf document.tex
 ```
 
 ### Usage in [GitLab CI](https://docs.gitlab.com/ce/ci/)
@@ -142,31 +149,46 @@ build:
       - document.pdf
 ```
 
-## Available Tags
+## Available tags
 
-- `edge` - the edge build
+- `edge` - the edge build. Usually created on the first and fifteenth of a month.
 - `latest` - the latest released version
-- `YYYY-MM-DD` - a build of that date. Usually created on the first and fifteenth of a month
+- `YYYY-MM-DD` - a build of that date. Usually created on the first and fifteenth of a month.
+
+Browse all available tags at <https://hub.docker.com/repository/docker/danteev/texlive/tags?page=1&ordering=last_updated>.
 
 ### Other versions
 
-- `2020` - latest TeXLive 2020 build
-- `2020-01` - first image release in year 2020
+- `2021-A` - first image release in year 2021
+- `2020-A` - latest TeXLive 2020 build
 - `TL2017` - TeXLive 2017 build
 - For all other versions see [CHANGELOG.md](https://github.com/dante-ev/docker-texlive/blob/master/CHANGELOG.md#changelog).
 
 ### Usage example
 
-You can run the TeXLive 2017 version by using the tag `TL2017`:
+```terminal
+docker run --rm -it -v $(pwd):/workdir danteev/texlive latexmk document.tex
+```
+
+In case you want to use an explcit tag, you can do it as follows:
+
+You can run the build of 2021-05-15 by using the tag `2021-05-15`:
 
 ```terminal
-docker run --rm -it -v $(pwd):/home danteev/texlive:TL2017 latexmk document.tex
+docker run --rm -it -v $(pwd):/workdir danteev/texlive:2021-05-15 latexmk document.tex
 ```
 
 ## Background
 
 We decided to base on the official texlive image, because this ensures recent texlive packages and a working basic build.
 We extended the image with tools required for our use cases.
+
+## Development hints
+
+- At a release, we point to a specific tag of the "upstream" Docker image.
+  To find out the lasest tag there, follow the instructions at <https://gitlab.com/islandoftex/images/texlive/-/issues/9>.
+  Search for `build:latest: [2021, no, no]` in the build jobs.
+  `no, no` means: no documentation and no source files.
 
 ## Alternatives
 
@@ -180,6 +202,7 @@ In case this all-in-one image is too large for you, you might be interested in f
 
 - [Google Inconsolata](https://fonts.google.com/specimen/Inconsolata) is licensed under [OFL-1.1](https://spdx.org/licenses/OFL-1.1.html).
 - [IBM Plex™](https://github.com/IBM/plex/) is licensed under [OFL-1.1](https://spdx.org/licenses/OFL-1.1.html).
+- Luximono is lucensed under the [Bigelow & Holmes - Luxi License](https://www.fontsquirrel.com/license/luxi-mono).
 - [pkgcheck](https://ctan.org/pkg/pkgcheck) is licensed under Apache-2.0 or MIT.
 - The files in this repository are licensed under [MIT](https://spdx.org/licenses/MIT.html).
 - Each LaTeX package has its own license.
