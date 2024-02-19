@@ -19,6 +19,10 @@ WORKDIR /home
 # See https://github.com/debuerreotype/docker-debian-artifacts/issues/24#issuecomment-360870939
 RUN mkdir -p /usr/share/man/man1
 
+RUN apt-get update -q && \
+    # install wget
+    apt-get install -qqy -o=Dpkg::Use-Pty=0 wget
+
 # pandoc in the repositories is older - we just overwrite it with a more recent version
 RUN wget https://github.com/jgm/pandoc/releases/download/2.12/pandoc-2.12-1-amd64.deb -q --output-document=/home/pandoc.deb && dpkg -i pandoc.deb && rm pandoc.deb
 
