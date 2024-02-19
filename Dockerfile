@@ -105,10 +105,14 @@ RUN mkdir -p /tmp/fonts && \
 #v ENV PATH="/usr/local/texlive/2023/bin/x86_64-linux:${PATH}"
 
 # install luximono
+RUN echo "check_certificate = off" >> ~/.wgetrc
+RUN apt-get install -qqy -o=Dpkg::Use-Pty=0 ca-certificates
+RUN update-ca-certificates
+RUN c_rehash
 RUN cd /tmp && \
-    wget https://www.tug.org/fonts/getnonfreefonts/install-getnonfreefonts -q --output-document=/tmp/install-getnonfreefonts && \
-    texlua /tmp/install-getnonfreefonts && \
-    /usr/local/texlive/2021/texmf-dist/scripts/getnonfreefonts/getnonfreefonts.pl --sys --all
+    wget https://www.tug.org/fonts/getnonfreefonts/install-getnonfreefonts  --output-document=/tmp/install-getnonfreefonts 
+RUN texlua /tmp/install-getnonfreefonts
+RUN file="$(find / -name getnonfreefonts.pl)" &&  $file --sys --all
 
 # update font index
 RUN luaotfload-tool --update

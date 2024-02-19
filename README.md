@@ -18,6 +18,14 @@ It builds on the [full texlive image by "Island of TeX"](https://gitlab.com/isla
 
 ### Using docker
 
+Build with:
+
+```terminal
+docker build -t nicetiger/texlive . 
+```
+
+Run with:
+
 ```terminal
 docker run --rm -it -v $(pwd):/home nicetiger/texlive latexmk -pdf document.tex
 ```
